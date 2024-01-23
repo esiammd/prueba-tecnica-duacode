@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { type DeleteResult, Repository, type UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { type CreateDepartmentDto } from './dto/create-department.dto';
 import { type UpdateDepartmentDto } from './dto/update-department.dto';
@@ -14,6 +18,14 @@ export class DepartmentsService {
   ) {}
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
+    const departmentExist = await this.departmentRepository.findOneBy({
+      name: createDepartmentDto.name,
+    });
+
+    if (departmentExist) {
+      throw new ConflictException('Department already exists');
+    }
+
     const department = this.departmentRepository.create(createDepartmentDto);
     return await this.departmentRepository.save(department);
   }
@@ -23,17 +35,37 @@ export class DepartmentsService {
   }
 
   async findOne(id: string): Promise<Department> {
-    return await this.departmentRepository.findOneBy({ id });
+    const department = await this.departmentRepository.findOneBy({ id });
+
+    if (!department) {
+      throw new NotFoundException('Department not found');
+    }
+
+    return department;
   }
 
   async update(
     id: string,
     updateDepartmentDto: UpdateDepartmentDto,
-  ): Promise<UpdateResult> {
-    return await this.departmentRepository.update(id, updateDepartmentDto);
+  ): Promise<Department> {
+    const department = await this.findOne(id);
+
+    if (!department) {
+      throw new NotFoundException('Department not found');
+    }
+
+    await this.departmentRepository.update(id, updateDepartmentDto);
+
+    return await this.findOne(id);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.departmentRepository.delete(id);
+  async remove(id: string): Promise<void> {
+    const department = await this.findOne(id);
+
+    if (!department) {
+      throw new NotFoundException('Department not found');
+    }
+
+    await this.departmentRepository.delete(id);
   }
 }

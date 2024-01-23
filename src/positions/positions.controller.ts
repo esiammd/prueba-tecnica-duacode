@@ -8,7 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { type DeleteResult, type UpdateResult } from 'typeorm';
 
 import { PositionsService } from './positions.service';
 import { CreatePositionDto } from './dto/create-position.dto';
@@ -41,12 +40,12 @@ export class PositionsController {
   async update(
     @Param('id') id: string,
     @Body() updatePositionDto: UpdatePositionDto,
-  ): Promise<UpdateResult> {
+  ): Promise<Position> {
     return await this.positionsService.update(id, updatePositionDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<DeleteResult> {
+  async remove(@Param('id') id: string): Promise<void> {
     return await this.positionsService.remove(id);
   }
 }

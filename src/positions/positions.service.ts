@@ -1,36 +1,32 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { type DeleteResult, Repository, type UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { type CreatePositionDto } from './dto/create-position.dto';
 import { type UpdatePositionDto } from './dto/update-position.dto';
 import { Position } from './entities/position.entity';
-
-import { Department } from 'src/departments/entities/department.entity';
 
 @Injectable()
 export class PositionsService {
   constructor(
     @InjectRepository(Position)
     private readonly positionRepository: Repository<Position>,
-
-    @InjectRepository(Department)
-    private readonly departmentRepository: Repository<Department>,
   ) {}
 
   async create(createPositionDto: CreatePositionDto): Promise<Position> {
-    const department = await this.departmentRepository.findOneBy({
-      name: createPositionDto.department,
+    const positionExist = await this.positionRepository.findOneBy({
+      name: createPositionDto.name,
     });
 
-    if (!department) {
-      throw new BadRequestException('Department not found');
+    if (positionExist) {
+      throw new ConflictException('Position already exists');
     }
 
-    const position = this.positionRepository.create({
-      ...createPositionDto,
-      department,
-    });
+    const position = this.positionRepository.create(createPositionDto);
     return await this.positionRepository.save(position);
   }
 
@@ -39,28 +35,37 @@ export class PositionsService {
   }
 
   async findOne(id: string): Promise<Position> {
-    return await this.positionRepository.findOneBy({ id });
+    const position = await this.positionRepository.findOneBy({ id });
+
+    if (!position) {
+      throw new NotFoundException('Position not found');
+    }
+
+    return position;
   }
 
   async update(
     id: string,
     updatePositionDto: UpdatePositionDto,
-  ): Promise<UpdateResult> {
-    const department = await this.departmentRepository.findOneBy({
-      name: updatePositionDto.department,
-    });
+  ): Promise<Position> {
+    const position = await this.findOne(id);
 
-    if (!department) {
-      throw new BadRequestException('Department not found');
+    if (!position) {
+      throw new NotFoundException('Position not found');
     }
 
-    return await this.positionRepository.update(id, {
-      ...updatePositionDto,
-      department,
-    });
+    await this.positionRepository.update(id, updatePositionDto);
+
+    return await this.findOne(id);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.positionRepository.delete(id);
+  async remove(id: string): Promise<void> {
+    const position = await this.findOne(id);
+
+    if (!position) {
+      throw new NotFoundException('Position not found');
+    }
+
+    await this.positionRepository.delete(id);
   }
 }

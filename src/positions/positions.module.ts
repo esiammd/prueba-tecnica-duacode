@@ -5,12 +5,9 @@ import { PositionsService } from './positions.service';
 import { PositionsController } from './positions.controller';
 import { Position } from './entities/position.entity';
 
-import { DepartmentsModule } from 'src/departments/departments.module';
-import { DepartmentsService } from 'src/departments/departments.service';
-
 @Module({
-  imports: [TypeOrmModule.forFeature([Position]), DepartmentsModule],
+  imports: [TypeOrmModule.forFeature([Position])],
   controllers: [PositionsController],
-  providers: [PositionsService, DepartmentsService],
+  providers: [PositionsService],
 })
 export class PositionsModule {}
