@@ -11,7 +11,7 @@ import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { type Skill } from './entities/skill.entity';
-import { type UpdateResult } from 'typeorm';
+import { type DeleteResult, type UpdateResult } from 'typeorm';
 
 @Controller('skills')
 export class SkillsController {
@@ -41,7 +41,7 @@ export class SkillsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    await this.skillsService.remove(id);
+  async remove(@Param('id') id: string): Promise<DeleteResult> {
+    return await this.skillsService.remove(id);
   }
 }
