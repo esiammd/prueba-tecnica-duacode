@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Position } from 'src/positions/entities/position.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Department {
@@ -10,4 +11,7 @@ export class Department {
 
   @Column({ nullable: true })
   description?: string;
+
+  @OneToMany(() => Position, position => position.department)
+  positions: Position[];
 }
