@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { type DeleteResult, type UpdateResult } from 'typeorm';
+
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { type Skill } from './entities/skill.entity';
-import { type DeleteResult, type UpdateResult } from 'typeorm';
 
+@ApiTags('skills')
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}

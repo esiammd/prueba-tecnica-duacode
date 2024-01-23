@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { type DeleteResult, type UpdateResult } from 'typeorm';
+
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { type Department } from './entities/department.entity';
-import { type DeleteResult, type UpdateResult } from 'typeorm';
 
+@ApiTags('departments')
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}

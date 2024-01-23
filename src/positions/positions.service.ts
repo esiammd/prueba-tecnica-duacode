@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { type DeleteResult, Repository, type UpdateResult } from 'typeorm';
+
 import { type CreatePositionDto } from './dto/create-position.dto';
 import { type UpdatePositionDto } from './dto/update-position.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Position } from './entities/position.entity';
+
 import { Department } from 'src/departments/entities/department.entity';
-import { type DeleteResult, Repository, type UpdateResult } from 'typeorm';
 
 @Injectable()
 export class PositionsService {

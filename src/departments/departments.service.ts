@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { type DeleteResult, Repository, type UpdateResult } from 'typeorm';
+
 import { type CreateDepartmentDto } from './dto/create-department.dto';
 import { type UpdateDepartmentDto } from './dto/update-department.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from './entities/department.entity';
-import { type DeleteResult, Repository, type UpdateResult } from 'typeorm';
 
 @Injectable()
 export class DepartmentsService {
