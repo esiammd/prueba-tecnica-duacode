@@ -13,8 +13,8 @@ export class PositionsService {
   ) {}
 
   async create(createPositionDto: CreatePositionDto): Promise<Position> {
-    const department = this.positionRepository.create(createPositionDto);
-    return await this.positionRepository.save(department);
+    const positions = this.positionRepository.create(createPositionDto);
+    return await this.positionRepository.save(positions);
   }
 
   async findAll(): Promise<Position[]> {
