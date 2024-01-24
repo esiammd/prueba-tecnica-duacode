@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DepartmentsModule } from './departments/departments.module';
 import { PositionsModule } from './positions/positions.module';
 import { SkillsModule } from './skills/skills.module';
+import { DuacodersModule } from './duacoders/duacoders.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SkillsModule } from './skills/skills.module';
     DepartmentsModule,
     PositionsModule,
     SkillsModule,
+    DuacodersModule,
   ],
 })
 export class AppModule {}

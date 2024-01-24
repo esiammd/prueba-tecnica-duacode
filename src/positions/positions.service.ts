@@ -1,7 +1,7 @@
 import {
   ConflictException,
-  Injectable,
   NotFoundException,
+  Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -55,7 +55,6 @@ export class PositionsService {
     }
 
     await this.positionRepository.update(id, updatePositionDto);
-
     return await this.findOne(id);
   }
 

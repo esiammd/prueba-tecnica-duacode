@@ -55,7 +55,6 @@ export class DepartmentsService {
     }
 
     await this.departmentRepository.update(id, updateDepartmentDto);
-
     return await this.findOne(id);
   }
 

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Duacoder } from 'src/duacoders/entities/duacoder.entity';
 
 @Entity()
 export class Department {
@@ -7,4 +8,7 @@ export class Department {
 
   @Column({ unique: true })
   name: string;
+
+  @OneToMany(() => Duacoder, duacoder => duacoder.department, { cascade: true })
+  duacoders: Duacoder[];
 }

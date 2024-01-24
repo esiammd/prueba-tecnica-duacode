@@ -1,7 +1,7 @@
 import {
   ConflictException,
-  Injectable,
   NotFoundException,
+  Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -52,7 +52,6 @@ export class SkillsService {
     }
 
     await this.skillRepository.update(id, updateSkillDto);
-
     return await this.findOne(id);
   }
 
