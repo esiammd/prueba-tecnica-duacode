@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { UsersModule } from './users/users.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { PositionsModule } from './positions/positions.module';
 import { SkillsModule } from './skills/skills.module';
 import { DuacodersModule } from './duacoders/duacoders.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,10 +22,12 @@ import { DuacodersModule } from './duacoders/duacoders.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    UsersModule,
     DepartmentsModule,
     PositionsModule,
     SkillsModule,
     DuacodersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
