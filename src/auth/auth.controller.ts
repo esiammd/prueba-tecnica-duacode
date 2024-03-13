@@ -5,7 +5,6 @@ import {
   Get,
   Post,
   Request as Req,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { type Request } from 'express';
@@ -13,8 +12,9 @@ import { type Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthGuard } from './guard/auth.guard';
 import { type User } from 'src/users/entities/user.entity';
+import { UserRole } from './enums/user-role.enum';
+import { Auth } from './decorators/auth.decorator';
 
 interface IRequestWithUser extends Request {
   user: Pick<User, 'email' | 'role'>;
@@ -38,7 +38,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  @UseGuards(AuthGuard)
+  @Auth(UserRole.ADMIN, UserRole.USER)
   @UseInterceptors(ClassSerializerInterceptor)
   async profile(@Req() request: IRequestWithUser): Promise<User> {
     return await this.authService.profile(request.user);
