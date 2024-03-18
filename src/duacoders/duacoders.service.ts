@@ -10,9 +10,9 @@ import { type CreateDuacoderDto } from './dto/create-duacoder.dto';
 import { type UpdateDuacoderDto } from './dto/update-duacoder.dto';
 import { Duacoder } from './entities/duacoder.entity';
 
-import { Department } from 'src/departments/entities/department.entity';
-import { Position } from 'src/positions/entities/position.entity';
-import { Skill } from 'src/skills/entities/skill.entity';
+import { Department } from '../departments/entities/department.entity';
+import { Position } from '../positions/entities/position.entity';
+import { Skill } from '../skills/entities/skill.entity';
 
 @Injectable()
 export class DuacodersService {
@@ -31,43 +31,15 @@ export class DuacodersService {
   ) {}
 
   async create(createDuacoderDto: CreateDuacoderDto): Promise<Duacoder> {
-    const duacoderExist = await this.duacoderRepository.findOneBy({
-      nif: createDuacoderDto.nif,
-    });
+    await this.validateDuacoder(createDuacoderDto.nif);
 
-    if (duacoderExist) {
-      throw new ConflictException('Duacoder already exists');
-    }
-
-    const department = await this.departmentRepository.findOneBy({
-      id: createDuacoderDto.departmentId,
-    });
-
-    if (!department) {
-      throw new NotFoundException('Department not found');
-    }
-
-    const position = await this.positionRepository.findOneBy({
-      id: createDuacoderDto.positionId,
-    });
-
-    if (!position) {
-      throw new NotFoundException('Position not found');
-    }
-
-    const skills = await Promise.all(
-      createDuacoderDto.skillIds.map(async skillId => {
-        const skillExist = await this.skillRepository.findOneBy({
-          id: skillId,
-        });
-
-        if (!skillExist) {
-          throw new NotFoundException(`Skill ${skillId} not found`);
-        }
-
-        return skillExist;
-      }),
+    const department = await this.validateDepartment(
+      createDuacoderDto.departmentId,
     );
+
+    const position = await this.validatePosition(createDuacoderDto.positionId);
+
+    const skills = await this.validateSkills(createDuacoderDto.skillIds);
 
     const duacoder = this.duacoderRepository.create({
       ...createDuacoderDto,
@@ -98,60 +70,28 @@ export class DuacodersService {
   ): Promise<Duacoder> {
     const duacoder = await this.findOne(id);
 
-    if (!duacoder) {
-      throw new NotFoundException('Duacoder not found');
-    }
-
-    if (updateDuacoderDto.nif && updateDuacoderDto.nif !== duacoder.nif) {
-      const nifExists = await this.duacoderRepository.findOneBy({
-        nif: updateDuacoderDto.nif,
-      });
-
-      if (nifExists) {
-        throw new ConflictException('NIF belongs to another duacode');
-      }
-    }
+    await this.validateNif(updateDuacoderDto.nif, duacoder.nif);
 
     let newDuacoder = { ...duacoder, ...updateDuacoderDto };
 
     if (updateDuacoderDto.departmentId) {
-      const department = await this.departmentRepository.findOneBy({
-        id: updateDuacoderDto.departmentId,
-      });
-
-      if (!department) {
-        throw new NotFoundException('Department not found');
-      }
+      const department = await this.validateDepartment(
+        updateDuacoderDto.departmentId,
+      );
 
       newDuacoder = { ...newDuacoder, department };
     }
 
     if (updateDuacoderDto.positionId) {
-      const position = await this.positionRepository.findOneBy({
-        id: updateDuacoderDto.positionId,
-      });
-
-      if (!position) {
-        throw new NotFoundException('Position not found');
-      }
+      const position = await this.validatePosition(
+        updateDuacoderDto.positionId,
+      );
 
       newDuacoder = { ...newDuacoder, position };
     }
 
     if (updateDuacoderDto.skillIds) {
-      const skills = await Promise.all(
-        updateDuacoderDto.skillIds.map(async skill => {
-          const skillExist = await this.skillRepository.findOneBy({
-            id: skill,
-          });
-
-          if (!skillExist) {
-            throw new NotFoundException(`Skill '${skill}' not found`);
-          }
-
-          return skillExist;
-        }),
-      );
+      const skills = await this.validateSkills(updateDuacoderDto.skillIds);
 
       newDuacoder = { ...newDuacoder, skills };
       delete newDuacoder.skillIds;
@@ -161,12 +101,70 @@ export class DuacodersService {
   }
 
   async remove(id: string): Promise<void> {
-    const duacoder = await this.findOne(id);
-
-    if (!duacoder) {
-      throw new NotFoundException('Duacoder not found');
-    }
+    await this.findOne(id);
 
     await this.duacoderRepository.softDelete(id);
+  }
+
+  private async validateDuacoder(nif: string): Promise<void> {
+    const duacoderExist = await this.duacoderRepository.findOneBy({ nif });
+
+    if (duacoderExist) {
+      throw new ConflictException('Duacoder already exists');
+    }
+  }
+
+  private async validateDepartment(departmentId: string): Promise<Department> {
+    const department = await this.departmentRepository.findOneBy({
+      id: departmentId,
+    });
+
+    if (!department) {
+      throw new NotFoundException('Department not found');
+    }
+
+    return department;
+  }
+
+  private async validatePosition(positionId: string): Promise<Position> {
+    const position = await this.positionRepository.findOneBy({
+      id: positionId,
+    });
+
+    if (!position) {
+      throw new NotFoundException('Position not found');
+    }
+
+    return position;
+  }
+
+  private async validateSkills(skillIds: string[]): Promise<Skill[]> {
+    const skills = await Promise.all(
+      skillIds.map(async skillId => {
+        const skillExist = await this.skillRepository.findOneBy({
+          id: skillId,
+        });
+
+        if (!skillExist) {
+          throw new NotFoundException(`Skill ${skillId} not found`);
+        }
+
+        return skillExist;
+      }),
+    );
+
+    return skills;
+  }
+
+  private async validateNif(newNif: string, oldNif: string): Promise<void> {
+    if (newNif && newNif !== oldNif) {
+      const nifExists = await this.duacoderRepository.findOneBy({
+        nif: newNif,
+      });
+
+      if (nifExists) {
+        throw new ConflictException('NIF belongs to another duacode');
+      }
+    }
   }
 }
