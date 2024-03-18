@@ -4,21 +4,17 @@ import {
   Controller,
   Get,
   Post,
-  Request as Req,
   UseInterceptors,
 } from '@nestjs/common';
-import { type Request } from 'express';
 
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { type User } from 'src/users/entities/user.entity';
-import { UserRole } from './enums/user-role.enum';
+import { type User } from '../users/entities/user.entity';
+import { UserRole } from '../common/enums/user-role.enum';
 import { Auth } from './decorators/auth.decorator';
-
-interface IRequestWithUser extends Request {
-  user: Pick<User, 'email' | 'role'>;
-}
+import { ActiveUser } from '../common/decorators/active-user.decorator';
+import { IUserActive } from '../common/interfaces/active-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -26,9 +22,7 @@ export class AuthController {
 
   @Post('register')
   @UseInterceptors(ClassSerializerInterceptor)
-  async register(
-    @Body() registerDto: RegisterDto,
-  ): Promise<Pick<User, 'name' | 'email'>> {
+  async register(@Body() registerDto: RegisterDto): Promise<User> {
     return await this.authService.register(registerDto);
   }
 
@@ -38,9 +32,9 @@ export class AuthController {
   }
 
   @Get('profile')
-  @Auth(UserRole.ADMIN, UserRole.USER)
+  @Auth(UserRole.USER)
   @UseInterceptors(ClassSerializerInterceptor)
-  async profile(@Req() request: IRequestWithUser): Promise<User> {
-    return await this.authService.profile(request.user);
+  async profile(@ActiveUser() user: IUserActive): Promise<User> {
+    return await this.authService.profile(user);
   }
 }

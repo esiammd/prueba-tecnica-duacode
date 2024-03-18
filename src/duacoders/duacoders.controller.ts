@@ -14,8 +14,11 @@ import { DuacodersService } from './duacoders.service';
 import { CreateDuacoderDto } from './dto/create-duacoder.dto';
 import { UpdateDuacoderDto } from './dto/update-duacoder.dto';
 import { type Duacoder } from './entities/duacoder.entity';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 @ApiTags('duacoders')
+@Auth(UserRole.USER)
 @Controller('duacoders')
 export class DuacodersController {
   constructor(private readonly duacodersService: DuacodersService) {}

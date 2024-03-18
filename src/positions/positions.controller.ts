@@ -13,6 +13,8 @@ import { PositionsService } from './positions.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { type Position } from './entities/position.entity';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @ApiTags('positions')
 @Controller('positions')
@@ -20,6 +22,7 @@ export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
 
   @Post()
+  @Auth(UserRole.ADMIN)
   async create(
     @Body() createPositionDto: CreatePositionDto,
   ): Promise<Position> {
@@ -46,6 +49,6 @@ export class PositionsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
-    return await this.positionsService.remove(id);
+    await this.positionsService.remove(id);
   }
 }

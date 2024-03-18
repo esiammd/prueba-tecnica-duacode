@@ -13,8 +13,11 @@ import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { type Skill } from './entities/skill.entity';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @ApiTags('skills')
+@Auth(UserRole.ADMIN)
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
@@ -44,6 +47,6 @@ export class SkillsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
-    return await this.skillsService.remove(id);
+    await this.skillsService.remove(id);
   }
 }

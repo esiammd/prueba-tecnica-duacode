@@ -6,10 +6,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
 
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { type RegisterDto } from './dto/register.dto';
 import { type LoginDto } from './dto/login.dto';
-import { type User } from 'src/users/entities/user.entity';
+import { type User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -18,11 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register({
-    name,
-    email,
-    password,
-  }: RegisterDto): Promise<Pick<User, 'name' | 'email'>> {
+  async register({ name, email, password, role }: RegisterDto): Promise<User> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
@@ -33,6 +29,7 @@ export class AuthService {
       name,
       email,
       password: await bcryptjs.hash(password, 10),
+      role,
     });
   }
 

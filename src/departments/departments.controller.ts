@@ -13,8 +13,11 @@ import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { type Department } from './entities/department.entity';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @ApiTags('departments')
+@Auth(UserRole.ADMIN)
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
