@@ -18,13 +18,7 @@ export class SkillsService {
   ) {}
 
   async create(createSkillDto: CreateSkillDto): Promise<Skill> {
-    const skillExist = await this.skillRepository.findOneBy({
-      name: createSkillDto.name,
-    });
-
-    if (skillExist) {
-      throw new ConflictException('Skill already exists');
-    }
+    await this.validateSkill(createSkillDto.name);
 
     const skill = this.skillRepository.create(createSkillDto);
     return await this.skillRepository.save(skill);
@@ -45,23 +39,23 @@ export class SkillsService {
   }
 
   async update(id: string, updateSkillDto: UpdateSkillDto): Promise<Skill> {
-    const skill = await this.findOne(id);
-
-    if (!skill) {
-      throw new NotFoundException('Skill not found');
-    }
+    await this.findOne(id);
 
     await this.skillRepository.update(id, updateSkillDto);
     return await this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
-    const skill = await this.findOne(id);
-
-    if (!skill) {
-      throw new NotFoundException('Skill not found');
-    }
+    await this.findOne(id);
 
     await this.skillRepository.delete(id);
+  }
+
+  private async validateSkill(name: string): Promise<void> {
+    const skillExist = await this.skillRepository.findOneBy({ name });
+
+    if (skillExist) {
+      throw new ConflictException('Skill already exists');
+    }
   }
 }

@@ -15,9 +15,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    if (createUserDto.role && !UserRole[createUserDto.role.toUpperCase()]) {
-      throw new NotFoundException('Role not found');
-    }
+    await this.validateRole(createUserDto.role);
 
     const user = this.userRepository.create(createUserDto);
     return await this.userRepository.save(user);
@@ -37,9 +35,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    if (updateUserDto.role && !UserRole[updateUserDto.role]) {
-      throw new NotFoundException('Role not found');
-    }
+    await this.validateRole(updateUserDto.role);
 
     await this.userRepository.update(id, updateUserDto);
     return await this.findOne(id);
@@ -47,5 +43,11 @@ export class UsersService {
 
   async remove(id: string): Promise<void> {
     await this.userRepository.softDelete(id);
+  }
+
+  private async validateRole(role: string): Promise<void> {
+    if (role && !UserRole[role.toUpperCase()]) {
+      throw new NotFoundException('Role not found');
+    }
   }
 }

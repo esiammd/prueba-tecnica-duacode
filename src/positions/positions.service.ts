@@ -18,13 +18,7 @@ export class PositionsService {
   ) {}
 
   async create(createPositionDto: CreatePositionDto): Promise<Position> {
-    const positionExist = await this.positionRepository.findOneBy({
-      name: createPositionDto.name,
-    });
-
-    if (positionExist) {
-      throw new ConflictException('Position already exists');
-    }
+    await this.validatePosition(createPositionDto.name);
 
     const position = this.positionRepository.create(createPositionDto);
     return await this.positionRepository.save(position);
@@ -48,23 +42,23 @@ export class PositionsService {
     id: string,
     updatePositionDto: UpdatePositionDto,
   ): Promise<Position> {
-    const position = await this.findOne(id);
-
-    if (!position) {
-      throw new NotFoundException('Position not found');
-    }
+    await this.findOne(id);
 
     await this.positionRepository.update(id, updatePositionDto);
     return await this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
-    const position = await this.findOne(id);
-
-    if (!position) {
-      throw new NotFoundException('Position not found');
-    }
+    await this.findOne(id);
 
     await this.positionRepository.delete(id);
+  }
+
+  private async validatePosition(name: string): Promise<void> {
+    const positionExist = await this.positionRepository.findOneBy({ name });
+
+    if (positionExist) {
+      throw new ConflictException('Position already exists');
+    }
   }
 }

@@ -18,13 +18,7 @@ export class DepartmentsService {
   ) {}
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
-    const departmentExist = await this.departmentRepository.findOneBy({
-      name: createDepartmentDto.name,
-    });
-
-    if (departmentExist) {
-      throw new ConflictException('Department already exists');
-    }
+    await this.validateDepartment(createDepartmentDto.name);
 
     const department = this.departmentRepository.create(createDepartmentDto);
     return await this.departmentRepository.save(department);
@@ -48,23 +42,23 @@ export class DepartmentsService {
     id: string,
     updateDepartmentDto: UpdateDepartmentDto,
   ): Promise<Department> {
-    const department = await this.findOne(id);
-
-    if (!department) {
-      throw new NotFoundException('Department not found');
-    }
+    await this.findOne(id);
 
     await this.departmentRepository.update(id, updateDepartmentDto);
     return await this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
-    const department = await this.findOne(id);
-
-    if (!department) {
-      throw new NotFoundException('Department not found');
-    }
+    await this.findOne(id);
 
     await this.departmentRepository.delete(id);
+  }
+
+  private async validateDepartment(name: string): Promise<void> {
+    const departmentExist = await this.departmentRepository.findOneBy({ name });
+
+    if (departmentExist) {
+      throw new ConflictException('Department already exists');
+    }
   }
 }
