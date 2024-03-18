@@ -1,4 +1,4 @@
-import { Duacoder } from 'src/duacoders/entities/duacoder.entity';
+import { Duacoder } from '../../duacoders/entities/duacoder.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

@@ -10,9 +10,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Department } from 'src/departments/entities/department.entity';
-import { Position } from 'src/positions/entities/position.entity';
-import { Skill } from 'src/skills/entities/skill.entity';
+import { Department } from '../../departments/entities/department.entity';
+import { Position } from '../../positions/entities/position.entity';
+import { Skill } from '../../skills/entities/skill.entity';
 
 @Entity()
 export class Duacoder {

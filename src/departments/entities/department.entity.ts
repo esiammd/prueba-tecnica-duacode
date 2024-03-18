@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Duacoder } from 'src/duacoders/entities/duacoder.entity';
+import { Duacoder } from '../../duacoders/entities/duacoder.entity';
 
 @Entity()
 export class Department {

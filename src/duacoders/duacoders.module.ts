@@ -5,14 +5,14 @@ import { DuacodersService } from './duacoders.service';
 import { DuacodersController } from './duacoders.controller';
 import { Duacoder } from './entities/duacoder.entity';
 
-import { DepartmentsModule } from 'src/departments/departments.module';
-import { DepartmentsService } from 'src/departments/departments.service';
+import { DepartmentsModule } from '../departments/departments.module';
+import { DepartmentsService } from '../departments/departments.service';
 
-import { PositionsModule } from 'src/positions/positions.module';
-import { PositionsService } from 'src/positions/positions.service';
+import { PositionsModule } from '../positions/positions.module';
+import { PositionsService } from '../positions/positions.service';
 
-import { SkillsModule } from 'src/skills/skills.module';
-import { SkillsService } from 'src/skills/skills.service';
+import { SkillsModule } from '../skills/skills.module';
+import { SkillsService } from '../skills/skills.service';
 
 @Module({
   imports: [
