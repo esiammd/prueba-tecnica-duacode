@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Duacoder } from '../../duacoders/entities/duacoder.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -9,6 +10,7 @@ export class Skill {
   @Column({ unique: true })
   name: string;
 
+  @ApiHideProperty()
   @ManyToMany(() => Duacoder, duacoder => duacoder.skills, { cascade: true })
   duacoders: Duacoder[];
 }

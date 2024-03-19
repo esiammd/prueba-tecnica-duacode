@@ -1,3 +1,4 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsBoolean,
@@ -33,5 +34,6 @@ export class CreateDuacoderDto {
   tortillaWithOnion: boolean;
 
   @IsDateString()
+  @ApiPropertyOptional({ example: 'yyyy-mm-dd' })
   dateOfBirth?: string;
 }

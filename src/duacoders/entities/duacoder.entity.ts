@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
@@ -13,6 +12,7 @@ import {
 import { Department } from '../../departments/entities/department.entity';
 import { Position } from '../../positions/entities/position.entity';
 import { Skill } from '../../skills/entities/skill.entity';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity()
 export class Duacoder {
@@ -56,6 +56,7 @@ export class Duacoder {
   @Column({ name: 'tortilla_with_onion' })
   tortillaWithOnion: boolean;
 
+  @ApiPropertyOptional({ example: 'yyyy-mm-dd' })
   @Column({ name: 'date_of_birth', nullable: true, type: 'date' })
   dateOfBirth?: string;
 
@@ -64,7 +65,4 @@ export class Duacoder {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
-
-  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
-  deletedAt: Date;
 }

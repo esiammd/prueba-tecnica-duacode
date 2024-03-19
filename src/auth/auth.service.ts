@@ -7,9 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
 
 import { UsersService } from '../users/users.service';
-import { type RegisterDto } from './dto/register.dto';
-import { type LoginDto } from './dto/login.dto';
+import { type RegisterInputDto } from './dto/register-input.dto';
+import { type LoginInputDto } from './dto/login-input.dto';
 import { type User } from '../users/entities/user.entity';
+import { type LoginOutputDto } from './dto/login-output.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register({ name, email, password, role }: RegisterDto): Promise<User> {
+  async register({
+    name,
+    email,
+    password,
+    role,
+  }: RegisterInputDto): Promise<User> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user) {
@@ -33,7 +39,7 @@ export class AuthService {
     });
   }
 
-  async login({ email, password }: LoginDto): Promise<{ token: string }> {
+  async login({ email, password }: LoginInputDto): Promise<LoginOutputDto> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (!user) {

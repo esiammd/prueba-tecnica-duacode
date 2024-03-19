@@ -7,23 +7,44 @@ import {
   Param,
   Delete,
   Query,
+  HttpCode,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { DuacodersService } from './duacoders.service';
 import { CreateDuacoderDto } from './dto/create-duacoder.dto';
 import { UpdateDuacoderDto } from './dto/update-duacoder.dto';
-import { type Duacoder } from './entities/duacoder.entity';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { Duacoder } from './entities/duacoder.entity';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 @ApiTags('duacoders')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'Unauthorized Bearer Auth.' })
+@ApiForbiddenResponse({ description: 'Forbidden access.' })
 @Auth(UserRole.USER)
 @Controller('duacoders')
 export class DuacodersController {
   constructor(private readonly duacodersService: DuacodersService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: 'Duacoder created successfully.',
+    type: Duacoder,
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request Response API.' })
+  @ApiConflictResponse({ description: 'Duacoder already exists.' })
   async create(
     @Body() createDuacoderDto: CreateDuacoderDto,
   ): Promise<Duacoder> {
@@ -31,6 +52,11 @@ export class DuacodersController {
   }
 
   @Get()
+  @ApiOkResponse({
+    description: 'List all duacoders.',
+    type: Duacoder,
+    isArray: true,
+  })
   async findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -39,11 +65,20 @@ export class DuacodersController {
   }
 
   @Get(':id')
+  @ApiOkResponse({
+    description: 'Displays the requested duacoder.',
+    type: Duacoder,
+  })
   async findOne(@Param('id') id: string): Promise<Duacoder> {
     return await this.duacodersService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiOkResponse({
+    description: 'Duacoder updated successfully.',
+    type: Duacoder,
+  })
+  @ApiNotFoundResponse({ description: 'Duacoder not found.' })
   async update(
     @Param('id') id: string,
     @Body() updateDuacoderDto: UpdateDuacoderDto,
@@ -52,6 +87,9 @@ export class DuacodersController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
+  @ApiNoContentResponse({ description: 'Duacoder successfully removed.' })
+  @ApiNotFoundResponse({ description: 'Duacoder not found.' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.duacodersService.remove(id);
   }

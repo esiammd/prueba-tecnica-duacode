@@ -42,7 +42,7 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.userRepository.softDelete(id);
+    await this.userRepository.delete(id);
   }
 
   private async validateRole(role: string): Promise<void> {
