@@ -72,30 +72,20 @@ export class DuacodersService {
 
     await this.validateNif(updateDuacoderDto.nif, duacoder.nif);
 
-    let newDuacoder = { ...duacoder, ...updateDuacoderDto };
-
-    if (updateDuacoderDto.departmentId) {
-      const department = await this.validateDepartment(
-        updateDuacoderDto.departmentId,
-      );
-
-      newDuacoder = { ...newDuacoder, department };
-    }
-
-    if (updateDuacoderDto.positionId) {
-      const position = await this.validatePosition(
-        updateDuacoderDto.positionId,
-      );
-
-      newDuacoder = { ...newDuacoder, position };
-    }
-
-    if (updateDuacoderDto.skillIds) {
-      const skills = await this.validateSkills(updateDuacoderDto.skillIds);
-
-      newDuacoder = { ...newDuacoder, skills };
-      delete newDuacoder.skillIds;
-    }
+    const newDuacoder = {
+      ...duacoder,
+      ...updateDuacoderDto,
+      department: updateDuacoderDto.departmentId
+        ? await this.validateDepartment(updateDuacoderDto.departmentId)
+        : undefined,
+      position: updateDuacoderDto.positionId
+        ? await this.validatePosition(updateDuacoderDto.positionId)
+        : undefined,
+      skills: updateDuacoderDto.skillIds
+        ? await this.validateSkills(updateDuacoderDto.skillIds)
+        : undefined,
+    };
+    delete newDuacoder.skillIds;
 
     return await this.duacoderRepository.save(newDuacoder);
   }
@@ -103,7 +93,7 @@ export class DuacodersService {
   async remove(id: string): Promise<void> {
     await this.findOne(id);
 
-    await this.duacoderRepository.softDelete(id);
+    await this.duacoderRepository.delete(id);
   }
 
   private async validateDuacoder(nif: string): Promise<void> {
