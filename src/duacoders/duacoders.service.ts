@@ -37,8 +37,6 @@ export class DuacodersService {
     await this.validateNif(createDuacoderDto.nif);
     await this.validateEmail(createDuacoderDto.email);
 
-    console.log(createDuacoderDto);
-
     const newDuacoder = this.duacoderRepository.create({
       ...createDuacoderDto,
       password: await bcryptjs.hash(createDuacoderDto.password, 10),
