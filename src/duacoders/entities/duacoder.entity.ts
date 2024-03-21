@@ -13,6 +13,8 @@ import { Department } from '../../departments/entities/department.entity';
 import { Position } from '../../positions/entities/position.entity';
 import { Skill } from '../../skills/entities/skill.entity';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
+import { DuacoderRole } from 'src/common/enums/duacoder-role.enum';
 
 @Entity()
 export class Duacoder {
@@ -25,22 +27,34 @@ export class Duacoder {
   @Column()
   name: string;
 
-  @Column()
-  biography: string;
+  @Column({ unique: true })
+  email: string;
 
-  @Column({ name: 'department_id' })
-  departmentId: string;
+  @Column()
+  @Exclude()
+  password: string;
+
+  @Column({ type: 'enum', enum: DuacoderRole, default: DuacoderRole.USER })
+  role: DuacoderRole;
+
+  @Column({ nullable: true })
+  biography?: string;
+
+  @Column({ name: 'department_id', nullable: true })
+  @Exclude()
+  departmentId?: string;
 
   @ManyToOne(() => Department, department => department.id, { eager: true })
   @JoinColumn({ name: 'department_id' })
-  department: Department;
+  department?: Department;
 
-  @Column({ name: 'position_id' })
-  positionId: string;
+  @Column({ name: 'position_id', nullable: true })
+  @Exclude()
+  positionId?: string;
 
   @ManyToOne(() => Position, position => position.id, { eager: true })
   @JoinColumn({ name: 'position_id' })
-  position: Position;
+  position?: Position;
 
   @ManyToMany(() => Skill, skill => skill.duacoders, { eager: true })
   @JoinTable({
@@ -48,10 +62,10 @@ export class Duacoder {
     joinColumn: { name: 'duacoder_id' },
     inverseJoinColumn: { name: 'skill_id' },
   })
-  skills: Skill[];
+  skills?: Skill[];
 
-  @Column()
-  photo: string;
+  @Column({ nullable: true })
+  photo?: string;
 
   @Column({ name: 'tortilla_with_onion' })
   tortillaWithOnion: boolean;

@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { PositionsModule } from './positions/positions.module';
 import { SkillsModule } from './skills/skills.module';
@@ -23,7 +22,6 @@ import { DuacodersModule } from './duacoders/duacoders.module';
       synchronize: true,
     }),
     AuthModule,
-    UsersModule,
     DepartmentsModule,
     PositionsModule,
     SkillsModule,

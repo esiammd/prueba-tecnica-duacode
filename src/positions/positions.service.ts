@@ -42,7 +42,9 @@ export class PositionsService {
     id: string,
     updatePositionDto: UpdatePositionDto,
   ): Promise<Position> {
-    await this.findOne(id);
+    const position = await this.findOne(id);
+
+    await this.comparePosition(updatePositionDto.name, position.name);
 
     await this.positionRepository.update(id, updatePositionDto);
     return await this.findOne(id);
@@ -59,6 +61,21 @@ export class PositionsService {
 
     if (positionExist) {
       throw new ConflictException('Position already exists');
+    }
+  }
+
+  private async comparePosition(
+    newPosition: string,
+    oldPosition: string,
+  ): Promise<void> {
+    if (newPosition && newPosition !== oldPosition) {
+      const positionExists = await this.positionRepository.findOneBy({
+        name: newPosition,
+      });
+
+      if (positionExists) {
+        throw new ConflictException('Position belongs to another duacode');
+      }
     }
   }
 }

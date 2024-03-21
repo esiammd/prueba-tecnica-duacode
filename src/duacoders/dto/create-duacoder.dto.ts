@@ -3,9 +3,13 @@ import {
   IsArray,
   IsBoolean,
   IsDateString,
+  IsEmail,
+  IsOptional,
   IsString,
   IsUUID,
+  MinLength,
 } from 'class-validator';
+import { DuacoderRole } from 'src/common/enums/duacoder-role.enum';
 
 export class CreateDuacoderDto {
   @IsString()
@@ -14,26 +18,43 @@ export class CreateDuacoderDto {
   @IsString()
   name: string;
 
+  @IsEmail()
+  email: string;
+
   @IsString()
-  biography: string;
+  @MinLength(6)
+  password: string;
+
+  @IsString()
+  @IsOptional()
+  role?: DuacoderRole;
+
+  @IsString()
+  @IsOptional()
+  biography?: string;
 
   @IsUUID()
-  departmentId: string;
+  @IsOptional()
+  departmentId?: string;
 
   @IsUUID()
-  positionId: string;
+  @IsOptional()
+  positionId?: string;
 
   @IsArray()
   @IsUUID(undefined, { each: true })
-  skillIds: string[];
+  @IsOptional()
+  skillIds?: string[];
 
   @IsString()
-  photo: string;
+  @IsOptional()
+  photo?: string;
 
   @IsBoolean()
   tortillaWithOnion: boolean;
 
   @IsDateString()
+  @IsOptional()
   @ApiPropertyOptional({ example: 'yyyy-mm-dd' })
   dateOfBirth?: string;
 }

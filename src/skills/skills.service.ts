@@ -39,7 +39,9 @@ export class SkillsService {
   }
 
   async update(id: string, updateSkillDto: UpdateSkillDto): Promise<Skill> {
-    await this.findOne(id);
+    const skill = await this.findOne(id);
+
+    await this.compareSkill(updateSkillDto.name, skill.name);
 
     await this.skillRepository.update(id, updateSkillDto);
     return await this.findOne(id);
@@ -56,6 +58,21 @@ export class SkillsService {
 
     if (skillExist) {
       throw new ConflictException('Skill already exists');
+    }
+  }
+
+  private async compareSkill(
+    newSkill: string,
+    oldSkill: string,
+  ): Promise<void> {
+    if (newSkill && newSkill !== oldSkill) {
+      const skillExists = await this.skillRepository.findOneBy({
+        name: newSkill,
+      });
+
+      if (skillExists) {
+        throw new ConflictException('Skill belongs to another duacode');
+      }
     }
   }
 }

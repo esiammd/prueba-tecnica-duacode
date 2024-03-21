@@ -25,13 +25,13 @@ import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { Department } from './entities/department.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { DuacoderRole } from '../common/enums/duacoder-role.enum';
 
 @ApiTags('departments')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized Bearer Auth.' })
 @ApiForbiddenResponse({ description: 'Forbidden access.' })
-@Auth(UserRole.ADMIN)
+@Auth(DuacoderRole.ADMIN)
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
@@ -73,6 +73,7 @@ export class DepartmentsController {
     description: 'Department updated successfully.',
     type: Department,
   })
+  @ApiConflictResponse({ description: 'Department already exists.' })
   @ApiNotFoundResponse({ description: 'Department not found.' })
   async update(
     @Param('id') id: string,

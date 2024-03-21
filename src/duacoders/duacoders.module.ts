@@ -28,5 +28,6 @@ import { SkillsService } from '../skills/skills.service';
     PositionsService,
     SkillsService,
   ],
+  exports: [DuacodersService],
 })
 export class DuacodersModule {}

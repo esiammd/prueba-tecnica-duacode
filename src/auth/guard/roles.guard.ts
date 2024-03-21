@@ -6,28 +6,28 @@ import {
 import { Reflector } from '@nestjs/core';
 
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { DuacoderRole } from '../../common/enums/duacoder-role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRole = this.reflector.getAllAndOverride<UserRole>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRole = this.reflector.getAllAndOverride<DuacoderRole>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!requiredRole) {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const { duacoder } = context.switchToHttp().getRequest();
 
-    if (user.role === UserRole.ADMIN) {
+    if (duacoder.role === DuacoderRole.ADMIN) {
       return true;
     }
 
-    return requiredRole === user.role;
+    return requiredRole === duacoder.role;
   }
 }

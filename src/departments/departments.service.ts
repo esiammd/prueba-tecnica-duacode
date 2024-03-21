@@ -42,7 +42,9 @@ export class DepartmentsService {
     id: string,
     updateDepartmentDto: UpdateDepartmentDto,
   ): Promise<Department> {
-    await this.findOne(id);
+    const department = await this.findOne(id);
+
+    await this.compareDepartment(updateDepartmentDto.name, department.name);
 
     await this.departmentRepository.update(id, updateDepartmentDto);
     return await this.findOne(id);
@@ -59,6 +61,21 @@ export class DepartmentsService {
 
     if (departmentExist) {
       throw new ConflictException('Department already exists');
+    }
+  }
+
+  private async compareDepartment(
+    newDepartment: string,
+    oldDepartment: string,
+  ): Promise<void> {
+    if (newDepartment && newDepartment !== oldDepartment) {
+      const departmentExists = await this.departmentRepository.findOneBy({
+        name: newDepartment,
+      });
+
+      if (departmentExists) {
+        throw new ConflictException('Department belongs to another duacode');
+      }
     }
   }
 }

@@ -8,6 +8,8 @@ import {
   Delete,
   Query,
   HttpCode,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -27,13 +29,14 @@ import { CreateDuacoderDto } from './dto/create-duacoder.dto';
 import { UpdateDuacoderDto } from './dto/update-duacoder.dto';
 import { Duacoder } from './entities/duacoder.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { DuacoderRole } from '../common/enums/duacoder-role.enum';
 
 @ApiTags('duacoders')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized Bearer Auth.' })
 @ApiForbiddenResponse({ description: 'Forbidden access.' })
-@Auth(UserRole.USER)
+@Auth(DuacoderRole.USER)
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('duacoders')
 export class DuacodersController {
   constructor(private readonly duacodersService: DuacodersService) {}
@@ -44,7 +47,7 @@ export class DuacodersController {
     type: Duacoder,
   })
   @ApiBadRequestResponse({ description: 'Bad Request Response API.' })
-  @ApiConflictResponse({ description: 'Duacoder already exists.' })
+  @ApiConflictResponse({ description: 'NIF or Email already registered.' })
   async create(
     @Body() createDuacoderDto: CreateDuacoderDto,
   ): Promise<Duacoder> {

@@ -26,13 +26,13 @@ import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { Position } from './entities/position.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { DuacoderRole } from '../common/enums/duacoder-role.enum';
 
 @ApiTags('positions')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized Bearer Auth.' })
 @ApiForbiddenResponse({ description: 'Forbidden access.' })
-@Auth(UserRole.ADMIN)
+@Auth(DuacoderRole.ADMIN)
 @Controller('positions')
 export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
@@ -74,6 +74,7 @@ export class PositionsController {
     description: 'Position updated successfully.',
     type: Position,
   })
+  @ApiConflictResponse({ description: 'Position already exists.' })
   @ApiNotFoundResponse({ description: 'Position not found.' })
   async update(
     @Param('id') id: string,

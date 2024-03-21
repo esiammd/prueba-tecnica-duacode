@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants/jwt.constant';
 
-import { UsersModule } from '../users/users.module';
+import { DuacodersModule } from '../duacoders/duacoders.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    UsersModule,
+    DuacodersModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

@@ -26,13 +26,13 @@ import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
-import { UserRole } from '../common/enums/user-role.enum';
+import { DuacoderRole } from '../common/enums/duacoder-role.enum';
 
 @ApiTags('skills')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Unauthorized Bearer Auth.' })
 @ApiForbiddenResponse({ description: 'Forbidden access.' })
-@Auth(UserRole.ADMIN)
+@Auth(DuacoderRole.ADMIN)
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
@@ -72,6 +72,7 @@ export class SkillsController {
     description: 'Skill updated successfully.',
     type: Skill,
   })
+  @ApiConflictResponse({ description: 'Skill already exists.' })
   @ApiNotFoundResponse({ description: 'Skill not found.' })
   async update(
     @Param('id') id: string,

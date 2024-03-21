@@ -1,64 +1,47 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
 
-import { UsersService } from '../users/users.service';
-import { type RegisterInputDto } from './dto/register-input.dto';
-import { type LoginInputDto } from './dto/login-input.dto';
-import { type User } from '../users/entities/user.entity';
-import { type LoginOutputDto } from './dto/login-output.dto';
+import { DuacodersService } from '../duacoders/duacoders.service';
+import { type Duacoder } from '../duacoders/entities/duacoder.entity';
+import { type RegisterDto } from './dto/register.dto';
+import { type LoginDto } from './dto/login.dto';
+import { type TokenDto } from './dto/token.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly duacodersService: DuacodersService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async register({
-    name,
-    email,
-    password,
-    role,
-  }: RegisterInputDto): Promise<User> {
-    const user = await this.usersService.findOneByEmail(email);
-
-    if (user) {
-      throw new ConflictException('User already exists');
-    }
-
-    return await this.usersService.create({
-      name,
-      email,
-      password: await bcryptjs.hash(password, 10),
-      role,
+  async register(RegisterDto: RegisterDto): Promise<Duacoder> {
+    return await this.duacodersService.create({
+      ...RegisterDto,
+      password: await bcryptjs.hash(RegisterDto.password, 10),
     });
   }
 
-  async login({ email, password }: LoginInputDto): Promise<LoginOutputDto> {
-    const user = await this.usersService.findOneByEmail(email);
+  async login({ email, password }: LoginDto): Promise<TokenDto> {
+    const duacoder = await this.duacodersService.findOneByEmail(email);
 
-    if (!user) {
+    if (!duacoder) {
       throw new UnauthorizedException('Email or password invalid');
     }
 
-    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    const isPasswordValid = await bcryptjs.compare(password, duacoder.password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Email or password invalid');
     }
 
-    const payload = { email: user.email, role: user.role };
+    const payload = { email: duacoder.email, role: duacoder.role };
     const token = await this.jwtService.signAsync(payload);
 
     return { token };
   }
 
-  async profile({ email }: Pick<User, 'email'>): Promise<User> {
-    return await this.usersService.findOneByEmail(email);
+  async profile({ email }: Pick<Duacoder, 'email'>): Promise<Duacoder> {
+    return await this.duacodersService.findOneByEmail(email);
   }
 }

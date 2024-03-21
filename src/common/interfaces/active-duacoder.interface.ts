@@ -1,4 +1,4 @@
-export interface IUserActive {
+export interface IDuacoderActive {
   email: string;
   role: string;
 }
