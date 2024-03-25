@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -27,6 +28,7 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { DuacoderRole } from '../common/enums/duacoder-role.enum';
+import { SkillFilterDto } from './dto/skill-filter.dto';
 
 @ApiTags('skills')
 @ApiBearerAuth()
@@ -54,8 +56,14 @@ export class SkillsController {
     type: Skill,
     isArray: true,
   })
-  async findAll(): Promise<Skill[]> {
-    return await this.skillsService.findAll();
+  async findAll(
+    @Query() { page, limit, ...filters }: SkillFilterDto,
+  ): Promise<Skill[]> {
+    return await this.skillsService.findAll({
+      limit,
+      offset: (page - 1) * limit,
+      ...filters,
+    });
   }
 
   @Get(':id')

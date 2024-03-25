@@ -30,6 +30,7 @@ import { UpdateDuacoderDto } from './dto/update-duacoder.dto';
 import { Duacoder } from './entities/duacoder.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { DuacoderRole } from '../common/enums/duacoder-role.enum';
+import { DuacoderFilterDto } from './dto/duacoder-filter.dto';
 
 @ApiTags('duacoders')
 @ApiBearerAuth()
@@ -60,11 +61,15 @@ export class DuacodersController {
     type: Duacoder,
     isArray: true,
   })
+  @ApiBadRequestResponse({ description: 'Bad Request Response API.' })
   async findAll(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
+    @Query() { page, limit, ...filters }: DuacoderFilterDto,
   ): Promise<Duacoder[]> {
-    return await this.duacodersService.findAll(page, limit);
+    return await this.duacodersService.findAll({
+      limit,
+      offset: (page - 1) * limit,
+      ...filters,
+    });
   }
 
   @Get(':id')

@@ -8,33 +8,27 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  MinLength,
 } from 'class-validator';
-import { DuacoderRole } from 'src/common/enums/duacoder-role.enum';
+import { PaginationFilterDto } from '../../common/dto/pagination-filter.dto';
+import { DuacoderRole } from '../../common/enums/duacoder-role.enum';
 
-export class CreateDuacoderDto {
+export class DuacoderFilterDto extends PaginationFilterDto {
   @IsString()
-  nif: string;
+  @IsOptional()
+  nif?: string;
 
   @IsString()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @Transform(({ value }) => value.toLowerCase())
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
 
-  @IsString()
-  @MinLength(6)
-  password: string;
-
-  @Transform(({ value }) => value.toUpperCase())
   @IsString()
   @IsOptional()
   role?: DuacoderRole;
-
-  @IsString()
-  @IsOptional()
-  biography?: string;
 
   @IsUUID()
   @IsOptional()
@@ -44,17 +38,21 @@ export class CreateDuacoderDto {
   @IsOptional()
   positionId?: string;
 
+  @Transform(({ value }) => {
+    const skillArray = value.split(',').map((skill: string) => skill.trim());
+    const uniqueSkills = new Set(skillArray);
+    const arrayOfUniqueSkills = Array.from(uniqueSkills);
+    return arrayOfUniqueSkills;
+  })
   @IsArray()
   @IsUUID(undefined, { each: true })
   @IsOptional()
   skillIds?: string[];
 
-  @IsString()
-  @IsOptional()
-  photo?: string;
-
+  @Transform(({ value }) => value === 'true')
   @IsBoolean()
-  tortillaWithOnion: boolean;
+  @IsOptional()
+  tortillaWithOnion?: boolean;
 
   @IsDateString()
   @IsOptional()

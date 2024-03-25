@@ -4,11 +4,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, type ObjectLiteral, Repository } from 'typeorm';
 
 import { type CreateSkillDto } from './dto/create-skill.dto';
 import { type UpdateSkillDto } from './dto/update-skill.dto';
 import { Skill } from './entities/skill.entity';
+import { type SkillFilterDto } from './dto/skill-filter.dto';
 
 @Injectable()
 export class SkillsService {
@@ -24,8 +25,25 @@ export class SkillsService {
     return await this.skillRepository.save(skill);
   }
 
-  async findAll(): Promise<Skill[]> {
-    return await this.skillRepository.find();
+  async findAll({
+    limit,
+    offset,
+    ...filters
+  }: SkillFilterDto): Promise<Skill[]> {
+    const { name } = filters;
+    const whereObj: ObjectLiteral = {};
+
+    if (name) {
+      whereObj.name = Like(`%${name}%`);
+    }
+
+    return await this.skillRepository
+      .createQueryBuilder('skill')
+      .where(whereObj)
+      .orderBy('skill.name', 'ASC')
+      .offset(offset)
+      .limit(limit)
+      .getMany();
   }
 
   async findOne(id: string): Promise<Skill> {

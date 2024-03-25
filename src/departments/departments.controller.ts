@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,6 +27,7 @@ import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { Department } from './entities/department.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { DuacoderRole } from '../common/enums/duacoder-role.enum';
+import { DepartmentFilterDto } from './dto/department-filter.dto';
 
 @ApiTags('departments')
 @ApiBearerAuth()
@@ -54,8 +56,14 @@ export class DepartmentsController {
     type: Department,
     isArray: true,
   })
-  async findAll(): Promise<Department[]> {
-    return await this.departmentsService.findAll();
+  async findAll(
+    @Query() { page, limit, ...filters }: DepartmentFilterDto,
+  ): Promise<Department[]> {
+    return await this.departmentsService.findAll({
+      limit,
+      offset: (page - 1) * limit,
+      ...filters,
+    });
   }
 
   @Get(':id')

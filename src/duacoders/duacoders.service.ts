@@ -4,7 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository, type ObjectLiteral } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 
 import { type CreateDuacoderDto } from './dto/create-duacoder.dto';
@@ -15,6 +15,7 @@ import { Department } from '../departments/entities/department.entity';
 import { Position } from '../positions/entities/position.entity';
 import { Skill } from '../skills/entities/skill.entity';
 import { DuacoderRole } from 'src/common/enums/duacoder-role.enum';
+import { type DuacoderFilterDto } from './dto/duacoder-filter.dto';
 
 @Injectable()
 export class DuacodersService {
@@ -55,8 +56,49 @@ export class DuacodersService {
       .then(async response => await this.findOne(response.id));
   }
 
-  async findAll(page: number = 1, limit: number = 3): Promise<Duacoder[]> {
-    return await this.duacoderRepository.find();
+  async findAll({
+    limit,
+    offset,
+    ...filters
+  }: DuacoderFilterDto): Promise<Duacoder[]> {
+    const { name, email, skillIds, ...otherFilters } = filters;
+    const whereObj: ObjectLiteral = {
+      ...otherFilters,
+    };
+
+    if (name) {
+      whereObj.name = Like(`%${name}%`);
+    }
+    if (email) {
+      whereObj.email = Like(`%${email}%`);
+    }
+
+    const duacodersWithSkillsRequiredQuery = this.duacoderRepository
+      .createQueryBuilder('duacoder')
+      .select('duacoder.id', 'id')
+      .leftJoin('duacoder.skills', 'skill')
+      .where(whereObj)
+      .andWhere('skill.id IN (:...skillIds)', { skillIds })
+      .groupBy('duacoder.id')
+      .having('COUNT(skill.id) = :numberOfSkills', {
+        numberOfSkills: skillIds.length,
+      })
+      .orderBy('duacoder.name', 'ASC')
+      .offset(offset)
+      .limit(limit);
+
+    return await this.duacoderRepository
+      .createQueryBuilder('duacoder')
+      .innerJoin(
+        `(${duacodersWithSkillsRequiredQuery.getQuery()})`,
+        'duacoderWithSkillsRequired',
+        'duacoder.id = duacoderWithSkillsRequired.id',
+      )
+      .setParameters(duacodersWithSkillsRequiredQuery.getParameters())
+      .leftJoinAndSelect('duacoder.department', 'department')
+      .leftJoinAndSelect('duacoder.position', 'position')
+      .leftJoinAndSelect('duacoder.skills', 'skill')
+      .getMany();
   }
 
   async findOne(id: string): Promise<Duacoder> {
@@ -116,7 +158,7 @@ export class DuacodersService {
   }
 
   private async validateRole(role: string): Promise<void> {
-    if (role && !DuacoderRole[role.toUpperCase()]) {
+    if (role && !DuacoderRole[role]) {
       throw new NotFoundException('Role not found');
     }
   }

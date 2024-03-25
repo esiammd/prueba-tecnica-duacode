@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -27,6 +28,7 @@ import { UpdatePositionDto } from './dto/update-position.dto';
 import { Position } from './entities/position.entity';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { DuacoderRole } from '../common/enums/duacoder-role.enum';
+import { PositionFilterDto } from './dto/position-filter.dto';
 
 @ApiTags('positions')
 @ApiBearerAuth()
@@ -56,8 +58,14 @@ export class PositionsController {
     type: Position,
     isArray: true,
   })
-  async findAll(): Promise<Position[]> {
-    return await this.positionsService.findAll();
+  async findAll(
+    @Query() { page, limit, ...filters }: PositionFilterDto,
+  ): Promise<Position[]> {
+    return await this.positionsService.findAll({
+      limit,
+      offset: (page - 1) * limit,
+      ...filters,
+    });
   }
 
   @Get(':id')

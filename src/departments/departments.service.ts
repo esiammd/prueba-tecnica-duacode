@@ -4,11 +4,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, type ObjectLiteral, Repository } from 'typeorm';
 
 import { type CreateDepartmentDto } from './dto/create-department.dto';
 import { type UpdateDepartmentDto } from './dto/update-department.dto';
 import { Department } from './entities/department.entity';
+import { type DepartmentFilterDto } from './dto/department-filter.dto';
 
 @Injectable()
 export class DepartmentsService {
@@ -24,8 +25,25 @@ export class DepartmentsService {
     return await this.departmentRepository.save(department);
   }
 
-  async findAll(): Promise<Department[]> {
-    return await this.departmentRepository.find();
+  async findAll({
+    limit,
+    offset,
+    ...filters
+  }: DepartmentFilterDto): Promise<Department[]> {
+    const { name } = filters;
+    const whereObj: ObjectLiteral = {};
+
+    if (name) {
+      whereObj.name = Like(`%${name}%`);
+    }
+
+    return await this.departmentRepository
+      .createQueryBuilder('department')
+      .where(whereObj)
+      .orderBy('department.name', 'ASC')
+      .offset(offset)
+      .limit(limit)
+      .getMany();
   }
 
   async findOne(id: string): Promise<Department> {

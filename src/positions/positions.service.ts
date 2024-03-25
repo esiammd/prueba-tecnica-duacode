@@ -4,11 +4,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, type ObjectLiteral, Repository } from 'typeorm';
 
 import { type CreatePositionDto } from './dto/create-position.dto';
 import { type UpdatePositionDto } from './dto/update-position.dto';
 import { Position } from './entities/position.entity';
+import { type PositionFilterDto } from './dto/position-filter.dto';
 
 @Injectable()
 export class PositionsService {
@@ -24,8 +25,25 @@ export class PositionsService {
     return await this.positionRepository.save(position);
   }
 
-  async findAll(): Promise<Position[]> {
-    return await this.positionRepository.find();
+  async findAll({
+    limit,
+    offset,
+    ...filters
+  }: PositionFilterDto): Promise<Position[]> {
+    const { name } = filters;
+    const whereObj: ObjectLiteral = {};
+
+    if (name) {
+      whereObj.name = Like(`%${name}%`);
+    }
+
+    return await this.positionRepository
+      .createQueryBuilder('position')
+      .where(whereObj)
+      .orderBy('position.name', 'ASC')
+      .offset(offset)
+      .limit(limit)
+      .getMany();
   }
 
   async findOne(id: string): Promise<Position> {
