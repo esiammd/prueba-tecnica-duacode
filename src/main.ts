@@ -18,8 +18,8 @@ async function bootstrap(): Promise<void> {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Duacode API')
-    .setDescription('Prueba técnica Duacode NestJS - Maíse')
+    .setTitle('User API')
+    .setDescription('Gestor de usuarios para empresa de IT')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
